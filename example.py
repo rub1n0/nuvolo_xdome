@@ -19,11 +19,11 @@ def get_devices(sys_id, name, limit=20):
     headers = {
         'Accept': 'application/json'
     }
-    response = requests.get(url, auth=(user, password), headers=headers, params=params)
+    response = requests.get(url, auth=(process.env.get("USER_NUVOLO"), process.env.get("PASSWORD_NUVOLO")), headers=headers, params=params)
     return response
 
-def update_ip_address(instance, user, password, table, sys_id, ip_address):
-    url = f'https://{instance}.service-now.com/api/now/table/{table}/{sys_id}'
+def update_ip_address(sys_id, ip_address):
+    url = f'https://{process.env.get("INSTANCE_NUVOLO")}.service-now.com/api/now/table/{process.env.get("TABLE_NUVOLO")}/{sys_id}'
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -31,7 +31,7 @@ def update_ip_address(instance, user, password, table, sys_id, ip_address):
     data = {
         'ip_address': ip_address
     }
-    response = requests.patch(url, auth=(user, password), headers=headers, json=data)
+    response = requests.patch(url, auth=(process.env.get("USER_NUVOLO"), process.env.get("PASSWORD_NUVOLO")), headers=headers, json=data)
     if response.status_code in (200, 204):
         print(f"Successfully updated ip_addresses to {ip_address} for sys_id {sys_id}")
     else:
