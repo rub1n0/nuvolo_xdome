@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-import requests
+from nuvolo_xdome.clients import NuvoloCMMSClient
 
 load_dotenv()
 
@@ -16,66 +16,30 @@ ip_address = os.getenv("IP_ADDRESS", "192.168.1.1")
 ip_list = [ip.strip() for ip in os.getenv("IP_LIST", "192.168.1.1,192.168.1.2,192.368.1.3").split(",")]
 sys_id = os.getenv("SYS_ID", "fd7c101cebcb6e10b8ceff47bad0cd99")
 
-def get_devices(instance, user, password, table, limit=20):
-    url = f'https://{instance}.service-now.com/api/now/table/{table}'
-    params = {
-        'sysparm_fields': 'sys_id,name',
-        'sysparm_limit': limit
-    }
-    headers = {
-        'Accept': 'application/json'
-    }
-    response = requests.get(url, auth=(user, password), headers=headers, params=params)
-    return response
+client = NuvoloCMMSClient(f"https://{INSTANCE}.service-now.com", USER, PASSWORD)
 
-def print_devices(response):
-    if response.status_code == 200:
-        results = response.json().get('result', [])
-        for record in results:
-            print(f"sys_id: {record.get('sys_id')}, name: {record.get('name')}")
-    else:
-        print(f'Error: {response.status_code} - {response.text}')
+def get_devices(client: NuvoloCMMSClient, table: str, limit: int = 20):
+    return client.search_assets(table, sysparm_fields="sys_id,name", sysparm_limit=limit)
 
-def update_ip_address(instance, user, password, table, sys_id, ip_address):
-    url = f'https://{instance}.service-now.com/api/now/table/{table}/{sys_id}'
-    headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'ip_address': ip_address
-    }
-    response = requests.patch(url, auth=(user, password), headers=headers, json=data)
-    if response.status_code in (200, 204):
-        print(f"Successfully updated ip_addresses to {ip_address} for sys_id {sys_id}")
-    else:
-        print(f"Failed to update: {response.status_code} - {response.text}")
+def print_devices(results):
+    for record in results:
+        print(f"sys_id: {record.get('sys_id')}, name: {record.get('name')}")
 
-def add_multiple_ips(instance, user, password, table, sys_id, ip_list):
+def update_ip_address(client: NuvoloCMMSClient, table: str, sys_id: str, ip_address: str):
+    client.update_asset(table, sys_id, {"ip_address": ip_address})
+    print(f"Successfully updated ip_addresses to {ip_address} for sys_id {sys_id}")
+
+def add_multiple_ips(client: NuvoloCMMSClient, table: str, sys_id: str, ip_list):
     """
     Adds multiple IPs to the ip_addresses field, each on a new line.
     """
-    ip_addresses = '\n'.join(ip_list)
-    url = f'https://{instance}.service-now.com/api/now/table/{table}/{sys_id}'
-    headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'ip_addresses': ip_addresses
-    }
-    response = requests.patch(url, auth=(user, password), headers=headers, json=data)
-    if response.status_code in (200, 204):
-        print(f"Successfully updated ip_addresses to:\n{ip_addresses}\nfor sys_id {sys_id}")
-    else:
-        print(f"Failed to update: {response.status_code} - {response.text}")
+    ip_addresses = "\n".join(ip_list)
+    client.update_asset(table, sys_id, {"ip_addresses": ip_addresses})
+    print(f"Successfully updated ip_addresses to:\n{ip_addresses}\nfor sys_id {sys_id}")
 
 def main():
-    # response = get_devices(INSTANCE, USER, PASSWORD, TABLE)
-    response = add_multiple_ips(INSTANCE, USER, PASSWORD, TABLE, sys_id, ip_list)
-    # update_ip_address(INSTANCE, USER, PASSWORD, TABLE, sys_id, ip_address)
-
-    print(response)
+    results = add_multiple_ips(client, TABLE, sys_id, ip_list)
+    print(results)
 
 if __name__ == '__main__':
     main()
