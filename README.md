@@ -24,3 +24,11 @@ engine = IntegrationEngine(nuvolo, xdome)
 engine.push_nuvolo_asset_to_xdome("<nuvolo_sys_id>")
 ```
 
+## Library Overview
+
+- **NuvoloCMMSClient** – wrappers for the ServiceNow Table API to search, create and update asset records.
+- **ClarotyXDomeClient** – simplified helper for xDome API requests following the "To Construct an API Request" section of the Claroty documentation.
+- **IntegrationEngine** – utility methods to push assets from one platform to the other.
+
+Each client maintains an internal `requests.Session` with the proper authentication headers so repeated calls are straightforward.
+
