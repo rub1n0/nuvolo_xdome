@@ -1,12 +1,20 @@
+import os
+
+from dotenv import load_dotenv
 import requests
 
-INSTANCE = 'scrippscmms'
-USER = 'svc_xdome_rest'
-PASSWORD = 'Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC'
-TABLE = 'x_nuvo_eam_clinical_devices'
-ip_address = '192.168.1.1'
-ip_list = ['192.168.1.1', '192.168.1.2', '192.368.1.3']
-sys_id = 'fd7c101cebcb6e10b8ceff47bad0cd99'
+load_dotenv()
+
+INSTANCE = os.getenv("INSTANCE", "scrippscmms")
+USER = os.getenv("USER", "svc_xdome_rest")
+PASSWORD = os.getenv(
+    "PASSWORD",
+    "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC",
+)
+TABLE = os.getenv("TABLE", "x_nuvo_eam_clinical_devices")
+ip_address = os.getenv("IP_ADDRESS", "192.168.1.1")
+ip_list = [ip.strip() for ip in os.getenv("IP_LIST", "192.168.1.1,192.168.1.2,192.368.1.3").split(",")]
+sys_id = os.getenv("SYS_ID", "fd7c101cebcb6e10b8ceff47bad0cd99")
 
 def get_devices(instance, user, password, table, limit=20):
     url = f'https://{instance}.service-now.com/api/now/table/{table}'
