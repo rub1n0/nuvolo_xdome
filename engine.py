@@ -29,6 +29,7 @@ def update_ip_address(client: NuvoloCMMSClient, table: str, sys_id: str, ip_addr
     print(f"Successfully updated ip_address to {ip_address} for sys_id {sys_id}")
     return result
 
+
 def add_multiple_ips(client: NuvoloCMMSClient, table: str, sys_id: str, ip_list):
     """
     Adds multiple IPs to the ip_addresses field, each on a new line.
@@ -62,6 +63,7 @@ def main() -> None:
         parser.error("Either --ip-address or --ip-list is required")
 
     print(result)
+
 
 if __name__ == '__main__':
     main()
