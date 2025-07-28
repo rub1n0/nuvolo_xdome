@@ -24,6 +24,14 @@ assets = nuvolo.search_records("x_nuvo_eam_clinical_devices", sysparm_limit=5)
 # update a record in Nuvolo
 nuvolo.update_record("x_nuvo_eam_clinical_devices", "<sys_id>", {"ip_address": "10.0.0.1"})
 
+# convenience helpers
+nuvolo.update_ip_address("x_nuvo_eam_clinical_devices", "<sys_id>", "10.0.0.1")
+nuvolo.add_multiple_ips(
+    "x_nuvo_eam_clinical_devices",
+    "<sys_id>",
+    ["192.0.2.1", "192.0.2.2"],
+)
+
 # add a new record to xDome
 xdome.add_record("assets", {"name": "Example"})
 ```
