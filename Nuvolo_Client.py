@@ -72,8 +72,10 @@ def add_multiple_ips(sys_id, ip_list):
         print(f"Failed to update: {response.status_code} - {response.text}")
 
 def main():
-    print(json.dumps(get_devices().json(), indent=4))
-    # update_ip_address(sys_id, ip_address)
+    response = search_devices(serial_number="US156W1824")
+    results = response.json().get('result', [])
+    for device in results:
+        print(device.get("u_scripps_bio_display_name"))
 
 if __name__ == '__main__':
     main()
