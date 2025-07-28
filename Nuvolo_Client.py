@@ -1,11 +1,15 @@
 import json
+import os
+from dotenv import load_dotenv
 import requests
 
+load_dotenv()
+
 sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
-instance_url = f'https://scrippscmms.service-now.com/api/now/table/'
-devices_table = "x_nuvo_eam_clinical_devices"
-instance_user = "svc_xdome_rest"
-instance_password = "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"
+instance_url = os.getenv("instance_url")
+devices_table = os.getenv("devices_table")
+instance_user = os.getenv("instance_user")
+instance_password = os.getenv("instance_password")
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
