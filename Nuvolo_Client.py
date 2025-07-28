@@ -4,32 +4,33 @@ from dotenv import load_dotenv
 import requests
 
 load_dotenv()
-
-sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
+# Load environment variables
 instance_url = os.getenv("INSTANCE_NUVOLO")
 devices_table = os.getenv("TABLE_NUVOLO")
 instance_user = os.getenv("USER_NUVOLO")
 instance_password = os.getenv("PASSWORD_NUVOLO")
+
+# Set headers for API requests
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
 }
 
-def _device_url(record_sys_id):
-    """Return the API URL for a specific device record."""
+def device_url(record_sys_id):
+    # Return the API URL for a specific device record.
     return f"{instance_url}{devices_table}/{record_sys_id}"
 
 def patch_device(record_sys_id, data):
-    """Helper used by setters to send PATCH requests."""
+    # Helper used by setters to send PATCH requests.
     return requests.patch(
-        _device_url(record_sys_id),
+        device_url(record_sys_id),
         auth=(instance_user, instance_password),
         headers=headers,
         json=data,
     )
 
 def get_devices(limit=1):
-    """Return a list of device records from ServiceNow."""
+    # Return a list of device records from ServiceNow.
     params = {
         'sysparm_limit': limit,
     }
@@ -42,7 +43,7 @@ def get_devices(limit=1):
     return response
 
 def search_devices(name=None, mac_addresses=None, model=None, serial_number=None, sysId=None, limit=10):
-    """Search for devices using multiple optional criteria."""
+    # Search for devices using multiple optional criteria.
     params = {'sysparm_limit': limit}
     query_parts = []
     if name:
@@ -66,7 +67,7 @@ def search_devices(name=None, mac_addresses=None, model=None, serial_number=None
     return response
 
 def set_ips(sys_id, ip_list):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     ip_addresses = '\n'.join(ip_list)
     data = {
         'ip_addresses': ip_addresses
@@ -78,7 +79,7 @@ def set_ips(sys_id, ip_list):
         log_action(f"{sys_id} - Failed to add ip_addresses: {response.status_code} - {response.text}")
 
 def set_macs(sys_id, mac_list):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     mac_addresses = '\n'.join(mac_list)
     data = {
         'mac_addresses': mac_addresses
@@ -90,7 +91,7 @@ def set_macs(sys_id, mac_list):
         log_action(f"{sys_id} - Failed to add update mac_addresses: {response.status_code} - {response.text}")
 
 def set_connection_type(sys_id, connection_type):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_connection_type': connection_type
     }
@@ -101,7 +102,7 @@ def set_connection_type(sys_id, connection_type):
         log_action(f"{sys_id} - Failed to add connection_type: {response.status_code} - {response.text}")
 
 def set_site_name(sys_id, site_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_site_name': site_name
     }
@@ -112,7 +113,7 @@ def set_site_name(sys_id, site_name):
         log_action(f"{sys_id} - Failed to add site_name: {response.status_code} - {response.text}")
 
 def set_xdome_id(sys_id, xdome_id):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_medigate_id': xdome_id
     }
@@ -123,7 +124,7 @@ def set_xdome_id(sys_id, xdome_id):
         log_action(f"{sys_id} - Failed to add xdome_id: {response.status_code} - {response.text}")
 
 def set_network(sys_id, network):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_network': network
     }
@@ -134,7 +135,7 @@ def set_network(sys_id, network):
         log_action(f"{sys_id} - Failed to add network: {response.status_code} - {response.text}")
 
 def set_xdome_category(sys_id, category):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_medigate_category': category
     }
@@ -145,7 +146,7 @@ def set_xdome_category(sys_id, category):
         log_action(f"{sys_id} - Failed to add xdome_category: {response.status_code} - {response.text}")
 
 def set_xdome_sub_category(sys_id, sub_category):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_medigate_sub_category': sub_category
     }
@@ -156,7 +157,7 @@ def set_xdome_sub_category(sys_id, sub_category):
         log_action(f"{sys_id} - Failed to add xdome_sub_category: {response.status_code} - {response.text}")
 
 def set_machine_type(sys_id, machine_type):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_machine_type': machine_type
     }
@@ -167,7 +168,7 @@ def set_machine_type(sys_id, machine_type):
         log_action(f"{sys_id} - Failed to add machine_type: {response.status_code} - {response.text}")
 
 def set_mobility(sys_id, mobility):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_mobility': mobility
     }
@@ -178,7 +179,7 @@ def set_mobility(sys_id, mobility):
         log_action(f"{sys_id} - Failed to add mobility: {response.status_code} - {response.text}")
 
 def set_os(sys_id, os):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'operating_system': os
     }
@@ -189,7 +190,7 @@ def set_os(sys_id, os):
         log_action(f"{sys_id} - Failed to add os: {response.status_code} - {response.text}")
 
 def set_os_name(sys_id, os_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_os_name': os_name
     }
@@ -200,7 +201,7 @@ def set_os_name(sys_id, os_name):
         log_action(f"{sys_id} - Failed to add os_name: {response.status_code} - {response.text}")
 
 def set_os_version(sys_id, os_version):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_os_version': os_version
     }
@@ -211,7 +212,7 @@ def set_os_version(sys_id, os_version):
         log_action(f"{sys_id} - Failed to add os_version: {response.status_code} - {response.text}")
 
 def set_app_version(sys_id, app_version):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_app_version': app_version
     }
@@ -222,7 +223,7 @@ def set_app_version(sys_id, app_version):
         log_action(f"{sys_id} - Failed to add app_version: {response.status_code} - {response.text}")
 
 def set_hw_version(sys_id, hw_version):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hw_version': hw_version
     }
@@ -233,7 +234,7 @@ def set_hw_version(sys_id, hw_version):
         log_action(f"{sys_id} - Failed to add hw_version: {response.status_code} - {response.text}")
 
 def set_ae_title(sys_id, ae_title):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'x_ctv_htm_aet': ae_title
     }
@@ -244,7 +245,7 @@ def set_ae_title(sys_id, ae_title):
         log_action(f"{sys_id} - Failed to add ae_title: {response.status_code} - {response.text}")
 
 def set_domain_name(sys_id, domain_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'dns_name': domain_name
     }
@@ -255,7 +256,7 @@ def set_domain_name(sys_id, domain_name):
         log_action(f"{sys_id} - Failed to add domain_name: {response.status_code} - {response.text}")
 
 def set_hostname_dhcp(sys_id, hostname_dhcp):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hostname_dhcp': hostname_dhcp
     }
@@ -266,7 +267,7 @@ def set_hostname_dhcp(sys_id, hostname_dhcp):
         log_action(f"{sys_id} - Failed to add hostname_dhcp: {response.status_code} - {response.text}")
 
 def set_hostname_http(sys_id, hostname_http):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hostname_http': hostname_http
     }
@@ -277,7 +278,7 @@ def set_hostname_http(sys_id, hostname_http):
         log_action(f"{sys_id} - Failed to add hostname_http: {response.status_code} - {response.text}")
 
 def set_hostname_snmp(sys_id, hostname_snmp):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hostname_snmp': hostname_snmp
     }
@@ -288,7 +289,7 @@ def set_hostname_snmp(sys_id, hostname_snmp):
         log_action(f"{sys_id} - Failed to add hostname_snmp: {response.status_code} - {response.text}")
 
 def set_hostname_win(sys_id, hostname_win):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hostname_win': hostname_win
     }
@@ -299,7 +300,7 @@ def set_hostname_win(sys_id, hostname_win):
         log_action(f"{sys_id} - Failed to add hostname_win: {response.status_code} - {response.text}")
 
 def set_hostname_other(sys_id, hostname_other):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_hostname_other': hostname_other
     }
@@ -310,7 +311,7 @@ def set_hostname_other(sys_id, hostname_other):
         log_action(f"{sys_id} - Failed to add hostname_other: {response.status_code} - {response.text}")
 
 def set_dhcp_fingerprint(sys_id, dhcp_fingerprint):
-    """Update the DHCP fingerprint for a device."""
+    # Update the DHCP fingerprint for a device.
     data = {
         'u_dhcp_fingerprint': dhcp_fingerprint
     }
@@ -321,7 +322,7 @@ def set_dhcp_fingerprint(sys_id, dhcp_fingerprint):
         log_action(f"{sys_id} - Failed to add dhcp_fingerprint: {response.status_code} - {response.text}")
 
 def set_device_name_protocol(sys_id, device_name_protocol):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_device_name_protocol': device_name_protocol
     }
@@ -332,7 +333,7 @@ def set_device_name_protocol(sys_id, device_name_protocol):
         log_action(f"{sys_id} - Failed to add device_name_protocol: {response.status_code} - {response.text}")
 
 def set_vlan(sys_id, vlan):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_vlan': vlan
     }
@@ -343,7 +344,7 @@ def set_vlan(sys_id, vlan):
         log_action(f"{sys_id} - Failed to add vlan: {response.status_code} - {response.text}")
 
 def set_vlan_name(sys_id, vlan_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_vlan_name': vlan_name
     }
@@ -354,7 +355,7 @@ def set_vlan_name(sys_id, vlan_name):
         log_action(f"{sys_id} - Failed to add vlan_name: {response.status_code} - {response.text}")
 
 def set_vlan_description(sys_id, vlan_description):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_vlan_description': vlan_description
     }
@@ -365,7 +366,7 @@ def set_vlan_description(sys_id, vlan_description):
         log_action(f"{sys_id} - Failed to add vlan_description: {response.status_code} - {response.text}")
 
 def set_ip_assignment(sys_id, ip_assignment):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_ip_assignment': ip_assignment
     }
@@ -376,7 +377,7 @@ def set_ip_assignment(sys_id, ip_assignment):
         log_action(f"{sys_id} - Failed to add ip_assignment: {response.status_code} - {response.text}")
 
 def set_managed_device(sys_id, managed_device):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_managed_device': managed_device
     }
@@ -387,7 +388,7 @@ def set_managed_device(sys_id, managed_device):
         log_action(f"{sys_id} - Failed to add managed_device: {response.status_code} - {response.text}")
 
 def set_wireless_encryption(sys_id, wireless_encryption):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_wireless_encryption': wireless_encryption
     }
@@ -398,7 +399,7 @@ def set_wireless_encryption(sys_id, wireless_encryption):
         log_action(f"{sys_id} - Failed to add wireless_encryption: {response.status_code} - {response.text}")
 
 def set_last_seen(sys_id, last_seen):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'last_discovered': last_seen
     }
@@ -409,7 +410,7 @@ def set_last_seen(sys_id, last_seen):
         log_action(f"{sys_id} - Failed to add last_seen: {response.status_code} - {response.text}")
 
 def set_location_protocol(sys_id, location_protocol):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_location_protocol': location_protocol
     }
@@ -420,7 +421,7 @@ def set_location_protocol(sys_id, location_protocol):
         log_action(f"{sys_id} - Failed to add location_protocol: {response.status_code} - {response.text}")
 
 def set_ap_bssid(sys_id, ap_bssid):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_ap_bssid': ap_bssid
     }
@@ -431,7 +432,7 @@ def set_ap_bssid(sys_id, ap_bssid):
         log_action(f"{sys_id} - Failed to add ap_bssid: {response.status_code} - {response.text}")
 
 def set_ssid(sys_id, ssid):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_ssid': ssid
     }
@@ -442,7 +443,7 @@ def set_ssid(sys_id, ssid):
         log_action(f"{sys_id} - Failed to add ssid: {response.status_code} - {response.text}")
 
 def set_ap_name(sys_id, ap_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_ap_name': ap_name
     }
@@ -453,7 +454,7 @@ def set_ap_name(sys_id, ap_name):
         log_action(f"{sys_id} - Failed to add ap_name: {response.status_code} - {response.text}")
 
 def set_ap_location(sys_id, ap_location):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_ap_location': ap_location
     }
@@ -464,7 +465,7 @@ def set_ap_location(sys_id, ap_location):
         log_action(f"{sys_id} - Failed to add ap_location: {response.status_code} - {response.text}")
 
 def set_last_seen_on_ap(sys_id, last_seen_on_ap):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_last_seen_on_ap': last_seen_on_ap
     }
@@ -475,7 +476,7 @@ def set_last_seen_on_ap(sys_id, last_seen_on_ap):
         log_action(f"{sys_id} - Failed to add last_seen_on_ap: {response.status_code} - {response.text}")
 
 def set_wlc_name(sys_id, wlc_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_wlc_name': wlc_name
     }
@@ -486,7 +487,7 @@ def set_wlc_name(sys_id, wlc_name):
         log_action(f"{sys_id} - Failed to add wlc_name: {response.status_code} - {response.text}")
 
 def set_wlc_location(sys_id, wlc_location):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_wlc_location': wlc_location
     }
@@ -497,7 +498,7 @@ def set_wlc_location(sys_id, wlc_location):
         log_action(f"{sys_id} - Failed to add wlc_location: {response.status_code} - {response.text}")
 
 def set_switch_ip(sys_id, switch_ip):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_ip': switch_ip
     }
@@ -508,7 +509,7 @@ def set_switch_ip(sys_id, switch_ip):
         log_action(f"{sys_id} - Failed to add switch_ip: {response.status_code} - {response.text}")
 
 def set_switch_mac(sys_id, switch_mac):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_mac': switch_mac
     }
@@ -519,7 +520,7 @@ def set_switch_mac(sys_id, switch_mac):
         log_action(f"{sys_id} - Failed to add switch_mac: {response.status_code} - {response.text}")
 
 def set_switch_port_id(sys_id, switch_port_id):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_port_id': switch_port_id
     }
@@ -530,7 +531,7 @@ def set_switch_port_id(sys_id, switch_port_id):
         log_action(f"{sys_id} - Failed to add switch_port_id: {response.status_code} - {response.text}")
 
 def set_switch_port_description(sys_id, switch_port_description):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_port_description': switch_port_description
     }
@@ -541,7 +542,7 @@ def set_switch_port_description(sys_id, switch_port_description):
         log_action(f"{sys_id} - Failed to add switch_port_description: {response.status_code} - {response.text}")
 
 def set_switch_name(sys_id, switch_name):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_name': switch_name
     }
@@ -552,7 +553,7 @@ def set_switch_name(sys_id, switch_name):
         log_action(f"{sys_id} - Failed to add switch_name: {response.status_code} - {response.text}")
 
 def set_switch_location(sys_id, switch_location):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_switch_location': switch_location
     }
@@ -563,7 +564,7 @@ def set_switch_location(sys_id, switch_location):
         log_action(f"{sys_id} - Failed to add switch_location: {response.status_code} - {response.text}")
 
 def set_last_seen_on_switch(sys_id, last_seen_on_switch):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_last_seen_on_switch': last_seen_on_switch
     }
@@ -574,7 +575,7 @@ def set_last_seen_on_switch(sys_id, last_seen_on_switch):
         log_action(f"{sys_id} - Failed to add last_seen_on_switch: {response.status_code} - {response.text}")
 
 def set_risk_score(sys_id, risk_score): 
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_cyber_risk_score': risk_score
     }
@@ -585,7 +586,7 @@ def set_risk_score(sys_id, risk_score):
         log_action(f"{sys_id} - Failed to add risk_score: {response.status_code} - {response.text}")
 
 def set_device_vulnerability_score(sys_id, vulnerability_score):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_device_vulnerability_score': vulnerability_score
     }
@@ -596,7 +597,7 @@ def set_device_vulnerability_score(sys_id, vulnerability_score):
         log_action(f"{sys_id} - Failed to add device_vulnerability_score: {response.status_code} - {response.text}")
 
 def set_device_severity_score(sys_id, severity_score):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_device_severity_score': severity_score
     }
@@ -607,7 +608,7 @@ def set_device_severity_score(sys_id, severity_score):
         log_action(f"{sys_id} - Failed to add device_severity_score: {response.status_code} - {response.text}")
 
 def set_fda_classification(sys_id, fda_classification):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_fda_class': fda_classification
     }
@@ -618,7 +619,7 @@ def set_fda_classification(sys_id, fda_classification):
         log_action(f"{sys_id} - Failed to add fda_classification: {response.status_code} - {response.text}")
 
 def set_phi(sys_id, phi):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_phi': phi
     }
@@ -629,7 +630,7 @@ def set_phi(sys_id, phi):
         log_action(f"{sys_id} - Failed to add phi: {response.status_code} - {response.text}")
 
 def set_endpoint_security(sys_id, endpoint_security):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_endpoint_security': endpoint_security
     }
@@ -640,7 +641,7 @@ def set_endpoint_security(sys_id, endpoint_security):
         log_action(f"{sys_id} - Failed to add endpoint_security: {response.status_code} - {response.text}")
 
 def set_ave_daily_usage(sys_id, ave_daily_usage):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_average_daily_usage': ave_daily_usage
     }
@@ -651,7 +652,7 @@ def set_ave_daily_usage(sys_id, ave_daily_usage):
         log_action(f"{sys_id} - Failed to add ave_daily_usage: {response.status_code} - {response.text}")
 
 def set_utilization(sys_id, utilization):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_utilization': utilization
     }
@@ -662,7 +663,7 @@ def set_utilization(sys_id, utilization):
         log_action(f"{sys_id} - Failed to add utilization: {response.status_code} - {response.text}")
 
 def set_link_to_xdome(sys_id, link_to_xdome):
-    """Update a single field of a device record."""
+    # Update a single field of a device record.
     data = {
         'u_link_to_xdome': link_to_xdome
     }
@@ -676,7 +677,7 @@ def log_action(action):
     print(f"[+] {action}")
 
 def main():
-
+    sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
     device_list = get_devices(10)
     if device_list.status_code == 200:
         data = device_list.json()
