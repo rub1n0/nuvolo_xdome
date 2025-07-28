@@ -2,7 +2,8 @@ import json
 import requests
 
 sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
-instance_url = f'https://scrippscmms.service-now.com/api/now/table/x_nuvo_eam_clinical_devices/'
+instance_url = f'https://scrippscmms.service-now.com/api/now/table/'
+devices_table = "x_nuvo_eam_clinical_devices"
 instance_user = "svc_xdome_rest"
 instance_password = "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"
 headers = {'Accept': 'application/json','Content-Type': 'application/json'}
@@ -13,7 +14,7 @@ def get_devices(limit=1):
     params = {
         'sysparm_limit': limit
     }
-    response = requests.get(instance_url, auth=(instance_user, instance_password), headers=headers, params=params)
+    response = requests.get(instance_url + devices_table, auth=(instance_user, instance_password), headers=headers, params=params)
     return response
 
 def search_devices(name=None, mac_addresses=None, model=None, serial_number=None, sysId=None, limit=10):
@@ -32,7 +33,7 @@ def search_devices(name=None, mac_addresses=None, model=None, serial_number=None
     if query_parts:
         params['sysparm_query'] = '^'.join(query_parts)
     response = requests.get(
-        instance_url,
+        instance_url + devices_table,
         auth=(instance_user, instance_password),
         headers=headers,
         params=params,
@@ -596,61 +597,80 @@ def log_action(action):
 
 def main():
 
- set_ips(sys_id, [""])
- set_macs(sys_id, [""])
- set_connection_type(sys_id, "")
- set_site_name(sys_id, "")
- set_xdome_id(sys_id, "")
- set_network(sys_id, "")
- set_xdome_category(sys_id, "")
- set_xdome_sub_category(sys_id, "")
- set_machine_type(sys_id, "")
- set_phi(sys_id, "")
- set_endpoint_security(sys_id, "")
- set_ave_daily_usage(sys_id, None)
- set_mobility(sys_id, "")
- set_os(sys_id, "")
- set_os_name(sys_id, "")
- set_os_version(sys_id, "")
- set_app_version(sys_id, "")
- set_hw_version(sys_id, "")
- set_ae_title(sys_id, "")
- set_domain_name(sys_id, "")
- set_hostname_dhcp(sys_id, "")
- set_hostname_http(sys_id, "")
- set_hostname_snmp(sys_id, "")
- set_hostname_win(sys_id, "")
- set_hostname_other(sys_id, "")
- set_dhcp_fingerlog_action(sys_id, "")
- set_device_name_protocol(sys_id, "")
- set_vlan(sys_id, "")
- set_vlan_name(sys_id, "")
- set_vlan_description(sys_id, "")
- set_ip_assignment(sys_id, "")
- set_ap_bssid(sys_id, "")
- set_ssid(sys_id, "")
- set_ap_name(sys_id, "")
- set_ap_location(sys_id, "")
- set_last_seen_on_ap(sys_id, "")
- set_wlc_name(sys_id, "")
- set_wlc_location(sys_id, "")
- set_switch_ip(sys_id, "")
- set_switch_name(sys_id, "")
- set_switch_location(sys_id, "")
- set_switch_mac(sys_id, "")
- set_switch_port_id(sys_id, "")
- set_switch_port_description(sys_id, "")
- set_last_seen_on_switch(sys_id, "")
- set_location_protocol(sys_id, "")
- set_risk_score(sys_id, None)
- set_device_vulnerability_score(sys_id, None)
- set_device_severity_score(sys_id, None)
- set_fda_classification(sys_id, "")
- set_phi(sys_id, "")
- set_endpoint_security(sys_id, "")
- set_ave_daily_usage(sys_id, None)
- set_utilization(sys_id, None)
- set_link_to_xdome(sys_id, "")
+    device_list = get_devices(10)
+    if device_list.status_code == 200:
+        data = device_list.json()
+        print("Device List:")   
+        for device in data.get('result', []):
+            print(f"\t-> {device.get('name')}")
+    else:
+        log_action(f"Failed to fetch devices: {device_list.status_code} - {device_list.text}")
+
+    search_result = search_devices(sysId="fd7c101cebcb6e10b8ceff47bad0cd99", limit=5)
+    if search_result.status_code == 200:
+        data = search_result.json()
+        print("Search Results:")
+        for device in data.get('result', []):
+            print(f"\t-> {device.get('name')}")
+    else:
+        log_action(f"Failed to search devices: {search_result.status_code} - {search_result.text}")
+
+### Example usage of the functions defined above
+#  set_ips(sys_id, [""])
+#  set_macs(sys_id, [""])
+#  set_connection_type(sys_id, "")
+#  set_site_name(sys_id, "")
+#  set_xdome_id(sys_id, "")
+#  set_network(sys_id, "")
+#  set_xdome_category(sys_id, "")
+#  set_xdome_sub_category(sys_id, "")
+#  set_machine_type(sys_id, "")
+#  set_phi(sys_id, "")
+#  set_endpoint_security(sys_id, "")
+#  set_ave_daily_usage(sys_id, None)
+#  set_mobility(sys_id, "")
+#  set_os(sys_id, "")
+#  set_os_name(sys_id, "")
+#  set_os_version(sys_id, "")
+#  set_app_version(sys_id, "")
+#  set_hw_version(sys_id, "")
+#  set_ae_title(sys_id, "")
+#  set_domain_name(sys_id, "")
+#  set_hostname_dhcp(sys_id, "")
+#  set_hostname_http(sys_id, "")
+#  set_hostname_snmp(sys_id, "")
+#  set_hostname_win(sys_id, "")
+#  set_hostname_other(sys_id, "")
+#  set_dhcp_fingerlog_action(sys_id, "")
+#  set_device_name_protocol(sys_id, "")
+#  set_vlan(sys_id, "")
+#  set_vlan_name(sys_id, "")
+#  set_vlan_description(sys_id, "")
+#  set_ip_assignment(sys_id, "")
+#  set_ap_bssid(sys_id, "")
+#  set_ssid(sys_id, "")
+#  set_ap_name(sys_id, "")
+#  set_ap_location(sys_id, "")
+#  set_last_seen_on_ap(sys_id, "")
+#  set_wlc_name(sys_id, "")
+#  set_wlc_location(sys_id, "")
+#  set_switch_ip(sys_id, "")
+#  set_switch_name(sys_id, "")
+#  set_switch_location(sys_id, "")
+#  set_switch_mac(sys_id, "")
+#  set_switch_port_id(sys_id, "")
+#  set_switch_port_description(sys_id, "")
+#  set_last_seen_on_switch(sys_id, "")
+#  set_location_protocol(sys_id, "")
+#  set_risk_score(sys_id, None)
+#  set_device_vulnerability_score(sys_id, None)
+#  set_device_severity_score(sys_id, None)
+#  set_fda_classification(sys_id, "")
+#  set_phi(sys_id, "")
+#  set_endpoint_security(sys_id, "")
+#  set_ave_daily_usage(sys_id, None)
+#  set_utilization(sys_id, None)
+#  set_link_to_xdome(sys_id, "")
     
 if __name__ == '__main__':
     main()
