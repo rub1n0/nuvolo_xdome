@@ -6,10 +6,10 @@ import requests
 load_dotenv()
 
 sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
-instance_url = os.getenv("instance_url")
-devices_table = os.getenv("devices_table")
-instance_user = os.getenv("instance_user")
-instance_password = os.getenv("instance_password")
+instance_url = os.getenv("INSTANCE_NUVOLO")
+devices_table = os.getenv("TABLE_NUVOLO")
+instance_user = os.getenv("USER_NUVOLO")
+instance_password = os.getenv("PASSWORD_NUVOLO")
 headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
