@@ -1,29 +1,25 @@
-from multiprocessing import process
+import json
 from unicodedata import name
 import requests
 
-INSTANCE_NUVOLO = process.env.get('INSTANCE_NUVOLO')
-USER_NUVOLO = process.env.get('USER_NUVOLO')
-PASSWORD_NUVOLO = process.env.get('PASSWORD_NUVOLO')
-TABLE_NUVOLO = process.env.get('TABLE_NUVOLO')
+
 ip_address = "192.168.1.1"
 ip_list = ["192.168.1.1","192.168.1.2"]
 sys_id = "fd7c101cebcb6e10b8ceff47bad0cd99"
 
-def get_devices(sys_id, name, limit=20):
-    url = f'https://{process.env.get("INSTANCE_NUVOLO")}.service-now.com/api/now/table/{process.env.get("TABLE_NUVOLO")}'
+def get_devices(limit=1):
+    url = f'https://scrippscmms.service-now.com/api/now/table/x_nuvo_eam_clinical_devices'
     params = {
-        'sysparm_fields': f"{sys_id},{name}",
         'sysparm_limit': limit
     }
     headers = {
         'Accept': 'application/json'
     }
-    response = requests.get(url, auth=(process.env.get("USER_NUVOLO"), process.env.get("PASSWORD_NUVOLO")), headers=headers, params=params)
+    response = requests.get(url, auth=("svc_xdome_rest", "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"), headers=headers, params=params)
     return response
 
 def update_ip_address(sys_id, ip_address):
-    url = f'https://{process.env.get("INSTANCE_NUVOLO")}.service-now.com/api/now/table/{process.env.get("TABLE_NUVOLO")}/{sys_id}'
+    url = f'https://scrippscmms.service-now.com/api/now/table/x_nuvo_eam_clinical_devices/{sys_id}'
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -31,7 +27,7 @@ def update_ip_address(sys_id, ip_address):
     data = {
         'ip_address': ip_address
     }
-    response = requests.patch(url, auth=(process.env.get("USER_NUVOLO"), process.env.get("PASSWORD_NUVOLO")), headers=headers, json=data)
+    response = requests.patch(url, auth=("svc_xdome_rest", "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"), headers=headers, json=data)
     if response.status_code in (200, 204):
         print(f"Successfully updated ip_addresses to {ip_address} for sys_id {sys_id}")
     else:
@@ -39,7 +35,7 @@ def update_ip_address(sys_id, ip_address):
 
 def add_multiple_ips(sys_id, ip_list):
     ip_addresses = '\n'.join(ip_list)
-    url = f'https://{process.env.get("INSTANCE_NUVOLO")}.service-now.com/api/now/table/{process.env.get("TABLE_NUVOLO")}/{sys_id}'
+    url = f'https://scrippscmms.service-now.com/api/now/table/x_nuvo_eam_clinical_devices/{sys_id}'
     headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -47,17 +43,15 @@ def add_multiple_ips(sys_id, ip_list):
     data = {
         'ip_addresses': ip_addresses
     }
-    response = requests.patch(url, auth=(process.env.get("USER_NUVOLO"), process.env.get("PASSWORD_NUVOLO")), headers=headers, json=data)
+    response = requests.patch(url, auth=("svc_xdome_rest", "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"), headers=headers, json=data)
     if response.status_code in (200, 204):
         print(f"Successfully updated ip_addresses to:\n{ip_addresses}\nfor sys_id {sys_id}")
     else:
         print(f"Failed to update: {response.status_code} - {response.text}")
 
 def main():
-    response = add_multiple_ips(sys_id, ip_list)
+    print(json.dumps(get_devices().json(), indent=4))
     # update_ip_address(sys_id, ip_address)
-
-    print(response)
 
 if __name__ == '__main__':
     main()
