@@ -1,5 +1,4 @@
 import json
-from unicodedata import name
 import requests
 
 
@@ -16,6 +15,29 @@ def get_devices(limit=1):
         'Accept': 'application/json'
     }
     response = requests.get(url, auth=("svc_xdome_rest", "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"), headers=headers, params=params)
+    return response
+
+def search_devices(name=None, mac_addresses=None, model=None, serial_number=None, limit=10):
+    url = 'https://scrippscmms.service-now.com/api/now/table/x_nuvo_eam_clinical_devices'
+    params = {'sysparm_limit': limit}
+    query_parts = []
+    if name:
+        query_parts.append(f"name={name}")
+    if mac_addresses:
+        query_parts.append(f"mac_addresses={mac_addresses}")
+    if model:
+        query_parts.append(f"model={model}")
+    if serial_number:
+        query_parts.append(f"serial_number={serial_number}")
+    if query_parts:
+        params['sysparm_query'] = '^'.join(query_parts)
+    headers = {'Accept': 'application/json'}
+    response = requests.get(
+        url,
+        auth=("svc_xdome_rest", "Xb_Ia}Dg9YdZyl#iNgYkowzv}0{Iq]dml^[gbs#Q$pbFoJHSBp:OI9bog6yAtX;{uvpWJoL_yE7K%:a!O#%]u.^FC$-,707Kg&ZC"),
+        headers=headers,
+        params=params,
+    )
     return response
 
 def update_ip_address(sys_id, ip_address):
