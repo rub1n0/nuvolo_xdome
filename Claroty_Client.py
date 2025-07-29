@@ -5,7 +5,7 @@ import requests
 load_dotenv()
 # Load environment variables
 instance_url = os.getenv("INSTANCE_CLAROTY")
-assets_endpoint = os.getenv("TABLE_CLAROTY")
+assets_table = os.getenv("TABLE_CLAROTY")
 api_key = os.getenv("API_KEY_CLAROTY")
 
 headers = {
@@ -16,7 +16,7 @@ headers = {
 
 def asset_url(asset_id: str) -> str:
     # Return the API URL for a specific asset record.
-    return f"{instance_url}{assets_endpoint}/{asset_id}"
+    return f"{instance_url}/{assets_table}/{asset_id}"
 
 
 def patch_asset(asset_id: str, data: dict) -> requests.Response:
@@ -31,7 +31,7 @@ def patch_asset(asset_id: str, data: dict) -> requests.Response:
 def get_assets(limit: int = 1) -> requests.Response:
     params = {"limit": limit}
     response = requests.get(
-        instance_url + assets_endpoint,
+        instance_url + "/" + assets_table,
         headers=headers,
         params=params,
     )
@@ -52,7 +52,7 @@ def search_assets(
     if query_parts:
         params["query"] = "&".join(query_parts)
     response = requests.get(
-        instance_url + assets_endpoint,
+        instance_url + "/" + assets_table,
         headers=headers,
         params=params,
     )
@@ -117,6 +117,18 @@ def set_cmms_cost_center(asset_id: str, cost_center: str) -> None:
 def log_action(action: str) -> None:
     print(f"[+] {action}")
 
+def main():
+    # Example usage
+    asset_id = "example_asset_id"
+    asset_tag = "example_asset_tag"
+    
+    # Search for assets
+    response = search_assets(asset_id=asset_id, asset_tag=asset_tag)
+    if response.status_code == 200:
+        print("Assets found:", response.json())
+    else:
+        print("Error searching assets:", response.status_code, response.text)
 
 if __name__ == "__main__":
-    pass
+    main()
+    # pass
