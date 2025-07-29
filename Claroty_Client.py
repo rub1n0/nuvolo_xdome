@@ -12,12 +12,18 @@ class ClarotyClient:
         load_dotenv()
         self.base_url = base_url or os.getenv("CLAROTY_BASE_URL")
         self.api_key = api_key or os.getenv("CLAROTY_API_KEY")
+
+        if not self.base_url or not self.api_key:
+            raise ValueError(
+                "CLAROTY_BASE_URL and CLAROTY_API_KEY must be provided either "
+                "via environment variables or as arguments."
+            )
+
         self.headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
         }
-        if self.api_key:
-            self.headers["Authorization"] = f"Bearer {self.api_key}"
 
     def _request(self, method: str, path: str, **kwargs: Any) -> requests.Response:
         url = f"{self.base_url}{path}"
