@@ -10,7 +10,7 @@ class ClarotyClient:
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None) -> None:
         load_dotenv()
-        self.base_url = (base_url or os.getenv("CLAROTY_BASE_URL") or "https://api.medigate.io").rstrip("/")
+        self.base_url = base_url or os.getenv("CLAROTY_BASE_URL")
         self.api_key = api_key or os.getenv("CLAROTY_API_KEY")
         self.headers = {
             "Accept": "application/json",

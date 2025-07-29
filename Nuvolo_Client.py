@@ -5,10 +5,10 @@ import requests
 
 load_dotenv()
 # Load environment variables
-instance_url = os.getenv("INSTANCE_NUVOLO")
-devices_table = os.getenv("TABLE_NUVOLO")
-instance_user = os.getenv("USER_NUVOLO")
-instance_password = os.getenv("PASSWORD_NUVOLO")
+instance_url = os.getenv("NUVOLO_INSTANCE")
+devices_table = os.getenv("NUVOLO_DEVICES_TABLE")
+instance_user = os.getenv("NUVOLO_USER")
+instance_password = os.getenv("NUVOLO_PASSWORD")
 
 # Set headers for API requests
 headers = {
