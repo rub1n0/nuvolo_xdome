@@ -1,134 +1,92 @@
 import os
-from dotenv import load_dotenv
+from typing import Any, Dict, List, Optional
+
 import requests
-
-load_dotenv()
-# Load environment variables
-instance_url = os.getenv("INSTANCE_CLAROTY")
-assets_table = os.getenv("TABLE_CLAROTY")
-api_key = os.getenv("API_KEY_CLAROTY")
-
-headers = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {api_key}' if api_key else None,
-}
-
-def asset_url(asset_id: str) -> str:
-    # Return the API URL for a specific asset record.
-    return f"{instance_url}/{assets_table}/{asset_id}"
+from dotenv import load_dotenv
 
 
-def patch_asset(asset_id: str, data: dict) -> requests.Response:
-    # Helper used by setters to send PATCH requests.
-    return requests.patch(
-        asset_url(asset_id),
-        headers=headers,
-        json=data,
-    )
+class ClarotyClient:
+    """Simple client for the Claroty xDome API."""
+
+    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None) -> None:
+        load_dotenv()
+        self.base_url = (base_url or os.getenv("CLAROTY_BASE_URL") or "https://api.medigate.io").rstrip("/")
+        self.api_key = api_key or os.getenv("CLAROTY_API_KEY")
+        self.headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        if self.api_key:
+            self.headers["Authorization"] = f"Bearer {self.api_key}"
+
+    def _request(self, method: str, path: str, **kwargs: Any) -> requests.Response:
+        url = f"{self.base_url}{path}"
+        return requests.request(method, url, headers=self.headers, **kwargs)
+
+    # CMMS assets endpoints
+    def get_cmms_assets(self, *, fields: List[str], filter_by: Optional[Dict[str, Any]] = None,
+                        include_count: bool = False, limit: int = 100, offset: int = 0,
+                        sort_by: Optional[List[Dict[str, Any]]] = None) -> requests.Response:
+        payload: Dict[str, Any] = {
+            "fields": fields,
+            "include_count": include_count,
+            "limit": limit,
+            "offset": offset,
+        }
+        if filter_by is not None:
+            payload["filter_by"] = filter_by
+        if sort_by is not None:
+            payload["sort_by"] = sort_by
+        return self._request("POST", "/api/v1/cmms/assets", json=payload)
+
+    def add_cmms_assets(self, assets: List[Dict[str, Any]]) -> requests.Response:
+        return self._request("POST", "/api/v1/cmms/assets/add", json={"assets": assets})
+
+    def delete_cmms_assets(self, filter_by: Dict[str, Any]) -> requests.Response:
+        return self._request("POST", "/api/v1/cmms/assets/delete", json={"filter_by": filter_by})
+
+    def start_matching(self) -> requests.Response:
+        return self._request("POST", "/api/v1/cmms/match")
+
+    def get_match_status(self, task_id: str) -> requests.Response:
+        return self._request("POST", "/api/v1/cmms/match/status", json={"task_id": task_id})
+
+    # Device endpoints
+    def get_devices(self, *, fields: List[str], filter_by: Optional[Dict[str, Any]] = None,
+                    include_count: bool = False, limit: int = 100, offset: int = 0,
+                    sort_by: Optional[List[Dict[str, Any]]] = None) -> requests.Response:
+        payload: Dict[str, Any] = {
+            "fields": fields,
+            "include_count": include_count,
+            "limit": limit,
+            "offset": offset,
+        }
+        if filter_by is not None:
+            payload["filter_by"] = filter_by
+        if sort_by is not None:
+            payload["sort_by"] = sort_by
+        return self._request("POST", "/api/v1/devices/", json=payload)
+
+    # Custom attribute endpoints
+    def replace_custom_attribute(self, params: Dict[str, Any]) -> requests.Response:
+        """Replace the values of a custom attribute."""
+        return self._request("POST", "/api/v1/custom-attributes/replace", json=params)
+
+    def set_custom_attribute(self, params: Dict[str, Any]) -> requests.Response:
+        """Set values for a custom attribute."""
+        return self._request("POST", "/api/v1/custom-attributes/set", json=params)
 
 
-def get_assets(limit: int = 1) -> requests.Response:
-    params = {"limit": limit}
-    response = requests.get(
-        instance_url + "/" + assets_table,
-        headers=headers,
-        params=params,
-    )
-    return response
+def main() -> None:
+    client = ClarotyClient()
+    # Example: check API connectivity by requesting empty match status (will likely fail without real task_id)
+    response = client.get_cmms_assets(fields=["cmms_uid"], limit=1)
+    print(response.status_code)
+    try:
+        print(response.json())
+    except Exception:
+        print(response.text)
 
-
-def search_assets(
-    asset_id: str | None = None,
-    asset_tag: str | None = None,
-    limit: int = 10,
-) -> requests.Response:
-    params = {"limit": limit}
-    query_parts = []
-    if asset_id:
-        query_parts.append(f"id={asset_id}")
-    if asset_tag:
-        query_parts.append(f"cmms_asset_tag={asset_tag}")
-    if query_parts:
-        params["query"] = "&".join(query_parts)
-    response = requests.get(
-        instance_url + "/" + assets_table,
-        headers=headers,
-        params=params,
-    )
-    return response
-
-
-def set_cmms_asset_tag(asset_id: str, asset_tag: str) -> None:
-    data = {'cmms_asset_tag': asset_tag}
-    response = patch_asset(asset_id, data)
-    if response.status_code in (200, 204):
-        log_action(f"{asset_id} - Successfully updated CMMS Asset Tag to: {asset_tag}")
-    else:
-        log_action(
-            f"{asset_id} - Failed to update CMMS Asset Tag: {response.status_code} - {response.text}"
-        )
-
-
-def set_cmms_state(asset_id: str, state: str) -> None:
-    data = {'cmms_state': state}
-    response = patch_asset(asset_id, data)
-    if response.status_code in (200, 204):
-        log_action(f"{asset_id} - Successfully updated CMMS State to: {state}")
-    else:
-        log_action(
-            f"{asset_id} - Failed to update CMMS State: {response.status_code} - {response.text}"
-        )
-
-
-def set_cmms_site(asset_id: str, site: str) -> None:
-    data = {'cmms_site': site}
-    response = patch_asset(asset_id, data)
-    if response.status_code in (200, 204):
-        log_action(f"{asset_id} - Successfully updated CMMS Site to: {site}")
-    else:
-        log_action(
-            f"{asset_id} - Failed to update CMMS Site: {response.status_code} - {response.text}"
-        )
-
-
-def set_cmms_building(asset_id: str, building: str) -> None:
-    data = {'cmms_building': building}
-    response = patch_asset(asset_id, data)
-    if response.status_code in (200, 204):
-        log_action(f"{asset_id} - Successfully updated CMMS Building to: {building}")
-    else:
-        log_action(
-            f"{asset_id} - Failed to update CMMS Building: {response.status_code} - {response.text}"
-        )
-
-
-def set_cmms_cost_center(asset_id: str, cost_center: str) -> None:
-    data = {'cmms_cost_center': cost_center}
-    response = patch_asset(asset_id, data)
-    if response.status_code in (200, 204):
-        log_action(f"{asset_id} - Successfully updated CMMS Cost Center to: {cost_center}")
-    else:
-        log_action(
-            f"{asset_id} - Failed to update CMMS Cost Center: {response.status_code} - {response.text}"
-        )
-
-
-def log_action(action: str) -> None:
-    print(f"[+] {action}")
-
-def main():
-    # Example usage
-    asset_id = "example_asset_id"
-    asset_tag = "example_asset_tag"
-    
-    # Search for assets
-    response = search_assets(asset_id=asset_id, asset_tag=asset_tag)
-    if response.status_code == 200:
-        print("Assets found:", response.json())
-    else:
-        print("Error searching assets:", response.status_code, response.text)
 
 if __name__ == "__main__":
     main()
-    # pass
