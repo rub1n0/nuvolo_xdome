@@ -30,9 +30,10 @@ This repository contains simple clients for interacting with Claroty xDome and N
    python Nuvolo_Client.py
    ```
 
-5. Run the matching engine to search xDome for devices whose `cmdb_asset_tag` matches the CMMS `name` field:
+5. Run the matching engine to search xDome for devices whose `cmdb_asset_tag` matches the CMMS `name` field.
+   You can optionally specify the number of worker threads:
    ```bash
-   python engine.py
+   python engine.py --threads 8
    ```
 
 If the required variables are missing, the client will raise a `ValueError` explaining what is needed.
