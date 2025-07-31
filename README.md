@@ -8,6 +8,7 @@ This repository contains simple clients for interacting with Claroty xDome and N
    ```bash
    pip install -r requirements.txt
    ```
+   This installs `tqdm` which is used to display a progress bar while matching.
 
 2. Create a `.env` file based on `.env.example` and populate it with your API credentials.
    Required variables for `Claroty_Client`:
@@ -31,6 +32,7 @@ This repository contains simple clients for interacting with Claroty xDome and N
    ```
 
 5. Run the matching engine to search xDome for devices whose `cmdb_asset_tag` matches the CMMS `name` field.
+   A progress bar will show the matching status.
    You can optionally specify the number of worker threads:
    ```bash
    python engine.py --threads 8

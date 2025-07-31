@@ -1,6 +1,8 @@
 import argparse
 import concurrent.futures
 
+from tqdm import tqdm
+
 import Nuvolo_Client as NC
 import Claroty_Client as CC
 
@@ -33,7 +35,14 @@ def find_matches(
         return 0
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as exe:
-        return sum(exe.map(lookup, devices))
+        results = []
+        for result in tqdm(
+            exe.map(lookup, devices),
+            total=len(devices),
+            desc="Matching",
+        ):
+            results.append(result)
+        return sum(results)
 
 
 if __name__ == "__main__":
