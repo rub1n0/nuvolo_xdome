@@ -45,8 +45,16 @@ class NuvoloClient:
         params = {"sysparm_limit": limit}
         return self._request("GET", self.devices_table, params=params)
 
-    def search_devices(self, limit: int = 10, **criteria: Optional[str]) -> requests.Response:
-        params = {"sysparm_limit": limit}
+    def search_devices(
+        self,
+        limit: int = 10,
+        offset: int = 0,
+        **criteria: Optional[str],
+    ) -> requests.Response:
+        params = {
+            "sysparm_limit": limit,
+            "sysparm_offset": offset,
+        }
         query = "^".join(f"{k}={v}" for k, v in criteria.items() if v is not None)
         if query:
             params["sysparm_query"] = query
