@@ -1,29 +1,37 @@
-import json
-from urllib import response
+import concurrent.futures
+
 import Nuvolo_Client as NC
 import Claroty_Client as CC
 
-cmms = NC.NuvoloClient()
-xdome = CC.ClarotyClient()
 
-matched_device_count = 0
+def find_matches(cmms_client: NC.NuvoloClient, xdome_client: CC.ClarotyClient) -> int:
+    """Return the number of CMMS devices whose name matches a xDome asset tag."""
+    devices_response = cmms_client.search_devices(limit=300, u_scripps_bio_active="true")
+    devices = devices_response.json().get("result", [])
 
-import concurrent.futures
-
-devices_cmms = cmms.search_devices(limit=300, u_scripps_bio_active="true")
-devices_list = devices_cmms.json().get("result", [])
-
-def process_device(device):
-    beic = device.get('name')
-    device_xdome = xdome.get_devices(filter_by={"cmdb_asset_tag": beic}, fields=["name", "ip_address"])
-    if device_xdome.status_code == 200:
-        if device_xdome:
-            print(f"Device {beic} found in XDome")
+    def lookup(device):
+        name = device.get("name")
+        if not name:
+            return 0
+        resp = xdome_client.get_devices(
+            fields=["name", "ip_address", "cmdb_asset_tag"],
+            filter_by={"cmdb_asset_tag": name},
+            limit=1,
+        )
+        if resp.status_code != 200:
+            return 0
+        matches = resp.json().get("devices", [])
+        if matches:
+            print(f"Device {name} found in xDome")
             return 1
-    return 0
+        return 0
 
-with concurrent.futures.ThreadPoolExecutor() as executor:
-    results = list(executor.map(process_device, devices_list))
-    matched_device_count = sum(results)
+    with concurrent.futures.ThreadPoolExecutor() as exe:
+        return sum(exe.map(lookup, devices))
 
-print(f"Total matched devices: {matched_device_count}")
+
+if __name__ == "__main__":
+    cmms = NC.NuvoloClient()
+    xdome = CC.ClarotyClient()
+    count = find_matches(cmms, xdome)
+    print(f"Total matched devices: {count}")
