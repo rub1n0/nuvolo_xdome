@@ -12,10 +12,28 @@ def find_matches(
     xdome_client: CC.ClarotyClient,
     *,
     num_threads: int | None = None,
+    limit: int = 300,
 ) -> int:
     """Return the number of CMMS devices whose name matches a xDome asset tag."""
-    devices_response = cmms_client.search_devices(limit=300, u_scripps_bio_active="true")
-    devices = devices_response.json().get("result", [])
+
+    devices: list[dict] = []
+    remaining = limit
+    offset = 0
+    while remaining > 0:
+        batch_size = min(remaining, 1000)
+        resp = cmms_client.search_devices(
+            limit=batch_size,
+            offset=offset,
+            u_scripps_bio_active="true",
+        )
+        batch = resp.json().get("result", [])
+        if not batch:
+            break
+        devices.extend(batch)
+        offset += len(batch)
+        remaining -= len(batch)
+        if len(batch) < batch_size:
+            break
 
     def lookup(device):
         name = device.get("name")
@@ -54,9 +72,16 @@ if __name__ == "__main__":
         default=None,
         help="Number of worker threads to use",
     )
+    parser.add_argument(
+        "-l",
+        "--limit",
+        type=int,
+        default=300,
+        help="Maximum number of CMMS devices to process",
+    )
     args = parser.parse_args()
 
     cmms = NC.NuvoloClient()
     xdome = CC.ClarotyClient()
-    count = find_matches(cmms, xdome, num_threads=args.threads)
+    count = find_matches(cmms, xdome, num_threads=args.threads, limit=args.limit)
     print(f"Total matched devices: {count}")

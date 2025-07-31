@@ -33,9 +33,9 @@ This repository contains simple clients for interacting with Claroty xDome and N
 
 5. Run the matching engine to search xDome for devices whose `cmdb_asset_tag` matches the CMMS `name` field.
    A progress bar will show the matching status.
-   You can optionally specify the number of worker threads:
+   You can optionally specify the number of worker threads and how many CMMS devices to process:
    ```bash
-   python engine.py --threads 8
+   python engine.py --threads 8 --limit 100
    ```
 
 If the required variables are missing, the client will raise a `ValueError` explaining what is needed.
