@@ -13,6 +13,7 @@ def find_matches(
     *,
     num_threads: int | None = None,
     limit: int = 300,
+    device_filters: dict[str, str] | None = None,
 ) -> int:
     """Return the number of CMMS devices whose name matches a xDome asset tag."""
 
@@ -21,10 +22,11 @@ def find_matches(
     offset = 0
     while remaining > 0:
         batch_size = min(remaining, 1000)
+        filter_kwargs = device_filters or {}
         resp = cmms_client.search_devices(
             limit=batch_size,
             offset=offset,
-            u_scripps_bio_active="true",
+            **filter_kwargs,
         )
         batch = resp.json().get("result", [])
         if not batch:
@@ -79,9 +81,35 @@ if __name__ == "__main__":
         default=300,
         help="Maximum number of CMMS devices to process",
     )
+    parser.add_argument(
+        "-f",
+        "--filter",
+        action="append",
+        default=[],
+        metavar="FIELD=VALUE",
+        help=(
+            "Optional CMMS query filter in ServiceNow format. "
+            "Can be provided multiple times."
+        ),
+    )
     args = parser.parse_args()
+
+    filter_kwargs: dict[str, str] = {}
+    for item in args.filter:
+        if "=" not in item:
+            parser.error(f"Invalid filter '{item}'. Expected format FIELD=VALUE.")
+        key, value = item.split("=", 1)
+        if not key:
+            parser.error(f"Invalid filter '{item}'. Field name is required.")
+        filter_kwargs[key] = value
 
     cmms = NC.NuvoloClient()
     xdome = CC.ClarotyClient()
-    count = find_matches(cmms, xdome, num_threads=args.threads, limit=args.limit)
+    count = find_matches(
+        cmms,
+        xdome,
+        num_threads=args.threads,
+        limit=args.limit,
+        device_filters=filter_kwargs or None,
+    )
     print(f"Total matched devices: {count}")

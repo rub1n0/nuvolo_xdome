@@ -1,5 +1,5 @@
 """Top-level package for nuvolo_xdome."""
 
-from .Nuvolo_Client import NuvoloCMMSClient
+from .Nuvolo_Client import NuvoloClient
 
-__all__ = ["NuvoloCMMSClient"]
+__all__ = ["NuvoloClient"]
